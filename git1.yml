@@ -1,0 +1,43 @@
+---
+- hosts: localhost
+  vars:
+    githubuser: "Nandhini0Perumal"
+    githubpassword: "ghp_xxxxxmH9NI1FQShTN9P3pBUwo"
+  tasks:
+  - name: create directory in local machine
+    file:
+      path: "{{ item }}"
+      mode: 0777
+      state: directory
+    with_items:
+      - '/home/sysadmin/TEST/GIT'
+    delegate_to: localhost
+
+  - name: git configuring and pulling the latest update
+    command: "{{item}} chdir=/home/sysadmin/TEST/GIT"
+    with_items:
+     - pwd
+     - git init
+     - git config --global user.email "nandhinisujaxxx@gmail.com"
+     - git config --global user.name "Nandhini0Perumal"
+     - git pull https://{{ githubuser | urlencode }}:{{ githubpassword | urlencode }}@github.com/Nandhini0Perumal/DB_Connection.git
+
+  - name: copying the file to git
+    copy:
+      src: /home/sysadmin/TEST/test.sql
+      dest: /home/sysadmin/TEST/GIT/test.sql
+
+  - name: git updating and pushing
+    command: "{{item}} chdir=/home/sysadmin/TEST/GIT"
+    with_items:
+     - git add --all
+     - git commit -m "test sql file added"
+     - git push https://{{ githubuser | urlencode }}:{{ githubpassword | urlencode }}@github.com/Nandhini0Perumal/DB_Connection.git master
+
+
+  - name: delete local copy
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+    - '/home/sysadmin/TEST/GIT'
